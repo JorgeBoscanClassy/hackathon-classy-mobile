@@ -10,7 +10,7 @@ import (
 
 type Donation struct {
 	Id        string    `json:"id"`
-	Amount    float32   `json:"amount" binding:"required"`
+	Amount    uint64    `json:"amount" binding:"required"`
 	Name      string    `json:"name" binding:"required"`
 	Email     string    `json:"email" binding:"required"`
 	Campaign  string    `json:"campaign" binding:"required"`

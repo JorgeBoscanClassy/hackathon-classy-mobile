@@ -3,20 +3,20 @@ package api
 import "time"
 
 type Home struct {
-	RaisedThisWeek float32        `json:"raisedThisWeek,omitempty"`
+	RaisedThisWeek uint64         `json:"raisedThisWeek,omitempty"`
 	Donations      []HomeDonation `json:"donations,omitempty"`
 }
 
 type HomeHighlight struct {
-	Name   string  `json:"name,omitempty"`
-	Amount float32 `json:"amount,omitempty"`
+	Name   string `json:"name,omitempty"`
+	Amount uint64 `json:"amount,omitempty"`
 }
 
 type HomeDonation struct {
 	Name     string    `json:"name,omitempty"`
 	Time     time.Time `json:"time,omitempty"`
 	Campaign string    `json:"campaign,omitempty"`
-	Amount   float32   `json:"amount,omitempty"`
+	Amount   uint64    `json:"amount,omitempty"`
 }
 
 var homeData Home = Home{}
