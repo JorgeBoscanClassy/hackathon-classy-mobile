@@ -3,12 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io"
 	"log"
 	"math/rand"
 	"strconv"
 	"strings"
-	"time"
 
 	"classy.org/classymobile/api"
 	"classy.org/classymobile/sse"
@@ -26,44 +24,44 @@ func main() {
 	r.Use(gin.Recovery())
 
 	// SSE
-	stream := sse.NewServer()
-	// sseRoute := r.Group("/sse")
-	// sseRoute.Use(HeadersMiddleware())
-	// sseRoute.Use(stream.ServeHTTP())
-	// sseRoute.GET("/subscribe", sse.StreamHandler)
-	// sseRoute.GET("/test", sse.TestMessage)
-
-	r.GET("/stream", func(c *gin.Context) {
-		// We are streaming current time to clients in the interval 10 seconds
-		go func() {
-			for {
-				time.Sleep(time.Second * 10)
-				now := time.Now().Format("2006-01-02 15:04:05")
-				currentTime := fmt.Sprintf("The Current Time Is %v", now)
-
-				// Send current time to clients message channel
-				stream.Message <- currentTime
-			}
-		}()
-
-		c.Stream(func(w io.Writer) bool {
-			// Stream message to client from message channel
-			if msg, ok := <-stream.Message; ok {
-				c.SSEvent("message", msg)
-				return true
-			}
-			return false
-		})
-	})
-
-	r.GET("/test", func(ctx *gin.Context) {
-		stream.Message <- "Test Message"
-	})
-
-	r.Use(HeadersMiddleware())
-	r.Use(stream.ServeHTTP())
-	r.GET("/sse/subscribe", sse.StreamHandler)
+	sse.NewServer()
+	sseRoute := r.Group("/sse")
+	sseRoute.Use(HeadersMiddleware())
+	sseRoute.Use(sse.Stream.ServeHTTP())
+	sseRoute.GET("/subscribe", sse.StreamHandler)
 	r.GET("/sse/test", sse.TestMessage)
+
+	// r.GET("/stream", func(c *gin.Context) {
+	// 	// We are streaming current time to clients in the interval 10 seconds
+	// 	// go func() {
+	// 	// 	for {
+	// 	// 		time.Sleep(time.Second * 10)
+	// 	// 		now := time.Now().Format("2006-01-02 15:04:05")
+	// 	// 		currentTime := fmt.Sprintf("The Current Time Is %v", now)
+
+	// 	// 		// Send current time to clients message channel
+	// 	// 		stream.Message <- currentTime
+	// 	// 	}
+	// 	// }()
+
+	// 	c.Stream(func(w io.Writer) bool {
+	// 		// Stream message to client from message channel
+	// 		if msg, ok := <-stream.Message; ok {
+	// 			c.SSEvent("message", msg)
+	// 			return true
+	// 		}
+	// 		return false
+	// 	})
+	// })
+
+	// r.GET("/test", func(ctx *gin.Context) {
+	// 	stream.Message <- "Test Message"
+	// })
+
+	// r.Use(HeadersMiddleware())
+	// r.Use(stream.serveHTTP())
+	// r.GET("/sse/subscribe", sse.StreamHandler)
+	// r.GET("/sse/test", sse.TestMessage)
 
 	// Donations
 	r.GET("/donations/:id", api.GetDonationById)
