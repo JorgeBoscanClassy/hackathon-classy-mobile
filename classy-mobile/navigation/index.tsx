@@ -57,9 +57,9 @@ const CheckinStack = createNativeStackNavigator();
 function CheckinStackScreen() {
   return (
     <CheckinStack.Navigator>
-      <CheckinStack.Screen name="Attendees" component={AttendessScreen} options={{ headerShown: true }}  />
-      <CheckinStack.Screen name="Checkin" component={CheckinScreen} options={{ headerShown: true }}  />
-      <CheckinStack.Screen name="Scanner" component={ScannerScreen} options={{ headerShown: true }}  />
+      <CheckinStack.Screen name="Attendees" component={AttendessScreen} options={{ headerTintColor: 'black', headerShown: true }}  />
+      <CheckinStack.Screen name="Checkin" component={CheckinScreen} options={{ headerTintColor: 'black', headerShown: true }}  />
+      <CheckinStack.Screen name="Scanner" component={ScannerScreen} options={{ headerTintColor: 'black', headerShown: true }}  />
     </CheckinStack.Navigator>
   );
 }
