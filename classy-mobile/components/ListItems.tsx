@@ -1,9 +1,22 @@
 import React, { Component } from 'react';
 import { StyleSheet, ScrollView, Dimensions } from 'react-native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Text, View } from './Themed';
 //import { Constants } from 'expo';
 
 const { width } = Dimensions.get('window');
+
+
+const ListItem = ({data, onPress}) => (<View style={{flexDirection:'column'}}>
+<TouchableOpacity activeOpacity={.8} style={styles.view} onPress={onPress} >
+    <View style={{ marginRight: 'auto'}}>
+    <Text style={styles.title}>{data.title}</Text>
+    <Text style={styles.label}>{data.label}</Text>
+    </View>
+    <Text style={styles.right}>{data.right}</Text>
+    </TouchableOpacity>
+    <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
+</View>)
 
 export class ListItems extends Component {
   
@@ -27,22 +40,16 @@ export class ListItems extends Component {
         }}>
             {this.props.data && this.props.data.map((card : any, index : number) => {
 
-                return <View key={index} style={{flexDirection:'column'}}>
-                    <View style={styles.view} >
-                        <View style={{ marginRight: 'auto'}}>
-                        <Text style={styles.title}>{card.title}</Text>
-                        <Text style={styles.label}>{card.label}</Text>
-                        </View>
-                        <Text style={styles.right}>{card.right}</Text>
-                        </View>
-                        <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-                    </View>
+                return <ListItem index={index} data={card}  />
 
             })}
       </View>
     );
   }
 }
+
+
+
 
 const styles = StyleSheet.create({
   container: {},
@@ -81,3 +88,4 @@ const styles = StyleSheet.create({
   },
 });
 
+export { ListItem };

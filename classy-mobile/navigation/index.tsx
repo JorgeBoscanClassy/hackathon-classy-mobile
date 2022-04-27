@@ -16,8 +16,12 @@ import ModalScreen from '../screens/ModalScreen';
 import NotFoundScreen from '../screens/NotFoundScreen';
 import Home from '../screens/Home';
 import Campaigns from '../screens/Campaigns';
+import AttendessScreen from '../screens/Events';
+import ScannerScreen from '../screens/Scanner';
+import CheckinScreen from '../screens/Checkin';
 import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
+
 
 export default function Navigation({ colorScheme }: { colorScheme: ColorSchemeName }) {
   return (
@@ -47,6 +51,20 @@ function RootNavigator() {
   );
 }
 
+
+const CheckinStack = createNativeStackNavigator();
+
+function CheckinStackScreen() {
+  return (
+    <CheckinStack.Navigator>
+      <CheckinStack.Screen name="Attendees" component={AttendessScreen} options={{ headerShown: true }}  />
+      <CheckinStack.Screen name="Checkin" component={CheckinScreen} options={{ headerShown: true }}  />
+      <CheckinStack.Screen name="Scanner" component={ScannerScreen} options={{ headerShown: true }}  />
+    </CheckinStack.Navigator>
+  );
+}
+
+
 /**
  * A bottom tab navigator displays tab buttons on the bottom of the display to switch screens.
  * https://reactnavigation.org/docs/bottom-tab-navigator
@@ -75,7 +93,7 @@ function BottomTabNavigator() {
                 opacity: pressed ? 0.5 : 1,
               })}>
               <Feather
-                name="info-circle"
+                name="bell"
                 size={25}
                 color={Colors[colorScheme].text}
                 style={{ marginRight: 15 }}
@@ -84,20 +102,22 @@ function BottomTabNavigator() {
           ),
         })}
       />
+     
       <BottomTab.Screen
+        name="Events"
+        component={CheckinStackScreen}
+        options={{
+          title: 'Check-In',
+          headerShown:false,
+          tabBarIcon: ({ color }) => <TabBarIcon name="clipboard" color={color} />,
+        }}
+      />
+       <BottomTab.Screen
         name="TabTwo"
         component={Campaigns}
         options={{
           title: 'Campaigns',
           tabBarIcon: ({ color }) => <TabBarIcon name="heart" color={color} />,
-        }}
-      />
-      <BottomTab.Screen
-        name="Events"
-        component={Campaigns}
-        options={{
-          title: 'Check In',
-          tabBarIcon: ({ color }) => <TabBarIcon name="clipboard" color={color} />,
         }}
       />
        <BottomTab.Screen
