@@ -11,6 +11,11 @@ export default function Home({ navigation }: RootTabScreenProps<'TabOne'>) {
   const [ raised, setRaised ] = useState(0);
 
   const amount_raised = 1560300;
+  const highlights = [{title : "$15,603.00", label:"Average Transaction Size" },
+                      {title : "$5,211,197.00", label:"Total Transactions" },
+                      {title : "5,632", label:"Active Campaigns" },
+                      {title : "$131,632", label:"Average Raised" },
+                      {title : "14", label:"Average Transactions" },]
   
 
   useEffect(() => {
@@ -44,7 +49,7 @@ export default function Home({ navigation }: RootTabScreenProps<'TabOne'>) {
       <View style={{ marginLeft:-20}}>
       </View>
       <Text style={styles.sectionHeader}>Highlights</Text>
-      <Highlights />
+      <Highlights data={highlights} />
       <Text style={styles.sectionHeader}>Donations</Text>
 
 

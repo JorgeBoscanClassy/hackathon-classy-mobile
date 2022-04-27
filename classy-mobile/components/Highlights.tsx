@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, StyleSheet, ScrollView, Dimensions } from 'react-native';
+import { View, StyleSheet, ScrollView, Dimensions, Text } from 'react-native';
 //import { Constants } from 'expo';
 
 const { width } = Dimensions.get('window');
@@ -27,11 +27,14 @@ export class Highlights extends Component {
           bottom: 0,
           right: 30,
         }}>
-        <View style={styles.view} />
-        <View style={styles.view2} />
-        <View style={styles.view} />
-        <View style={styles.view2} />
-        <View style={styles.view} />
+            {this.props.data && this.props.data.map((card : any, index : number) => {
+
+                return <View key={index} style={styles.view} >
+                        <Text style={styles.title}>{card.title}</Text>
+                        <Text style={styles.label}>{card.label}</Text>
+                        </View>
+
+            })}
       </ScrollView>
     );
   }
@@ -47,17 +50,22 @@ const styles = StyleSheet.create({
     marginLeft:0,
     height: 100,
     borderRadius: 10,
-    //paddingHorizontal : 30
+    paddingVertical:20,
+    paddingHorizontal:20
   },
-  view2: {
-    marginTop: 20,
-    backgroundColor: '#EB7251',
-    width: 250,
-    margin: 10,
-    height: 100,
-    marginLeft:0,
-    borderRadius: 10,
-    //paddingHorizontal : 30
+  label: {
+
+    color:'#fff',
+    fontSize:15
+
   },
+  title: {
+
+    color:'#fff',
+    fontWeight:'bold',
+    fontSize:30
+
+
+  }
 });
 
