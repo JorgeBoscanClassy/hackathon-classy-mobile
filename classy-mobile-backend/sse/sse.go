@@ -31,7 +31,7 @@ type Event struct {
 	TotalClients map[chan string]bool
 }
 
-// Initialize event and Start procnteessing requests
+// Initialize event and Start processing requests
 func NewServer() *Event {
 
 	Stream = &Event{
@@ -167,10 +167,6 @@ func removeChannel(channel chan string) {
 func TestMessage(ctx *gin.Context) {
 	testData := api.Home{
 		RaisedThisWeek: rand.Float32() * 10000000,
-		Highlights: []api.HomeHighlight{
-			{"Average Transaction Site", rand.Float32() * 10000000},
-			{"Total Transactions", rand.Float32() * 10000000},
-		},
 		Donations: []api.HomeDonation{
 			{"Omid Borijan", time.Now(), "WorldCentral", rand.Float32() * 10000000},
 			{"Tammen K", time.Now(), "Tunnels to Towers", rand.Float32() * 10000000},

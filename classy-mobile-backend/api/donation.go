@@ -9,12 +9,12 @@ import (
 )
 
 type Donation struct {
-	Id           string    `json:"id"`
-	Amount       float32   `json:"amount" binding:"required"`
-	Name         string    `json:"name" binding:"required"`
-	Email        string    `json:"email" binding:"required"`
-	Organization string    `json:"organization" binding:"required"`
-	CreatedOn    time.Time `json:"createdOn"`
+	Id        string    `json:"id"`
+	Amount    float32   `json:"amount" binding:"required"`
+	Name      string    `json:"name" binding:"required"`
+	Email     string    `json:"email" binding:"required"`
+	Campaign  string    `json:"campaign" binding:"required"`
+	CreatedOn time.Time `json:"createdOn"`
 }
 
 var Donations map[string]Donation = make(map[string]Donation)
@@ -48,5 +48,22 @@ func AddDonation(donation Donation) Donation {
 	donation.CreatedOn = time.Now()
 	Donations[id] = donation
 
+	go CalculateHomeData(donation)
 	return donation
+}
+
+func GetDonations(c *gin.Context) {
+	var result []Donation
+
+	i := 0
+	for _, v := range Donations {
+		result = append(result, v)
+		i++
+
+		if i == 25 {
+			break
+		}
+	}
+
+	c.JSON(http.StatusOK, result)
 }
