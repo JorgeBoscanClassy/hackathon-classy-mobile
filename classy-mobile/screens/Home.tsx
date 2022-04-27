@@ -3,7 +3,8 @@ import { useEffect , useState } from 'react'
 import { Text, View } from '../components/Themed';
 import { RootTabScreenProps } from '../types';
 import AnimatedNumbers from 'react-native-animated-numbers';
-
+import { Highlights } from '../components/Highlights';
+import { ScrollView } from 'react-native-gesture-handler';
 
 export default function Home({ navigation }: RootTabScreenProps<'TabOne'>) {
 
@@ -31,6 +32,7 @@ export default function Home({ navigation }: RootTabScreenProps<'TabOne'>) {
 
 
   return (
+    <ScrollView>
     <View style={styles.container}>
       <View style={{ flexDirection:'row'}}><Text style={styles.title}>$</Text><AnimatedNumbers
         includeComma
@@ -42,11 +44,13 @@ export default function Home({ navigation }: RootTabScreenProps<'TabOne'>) {
       <View style={{ marginLeft:-20}}>
       </View>
       <Text style={styles.sectionHeader}>Highlights</Text>
+      <Highlights />
       <Text style={styles.sectionHeader}>Donations</Text>
 
 
       <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
     </View>
+    </ScrollView>
   );
 }
 const styles = StyleSheet.create({
