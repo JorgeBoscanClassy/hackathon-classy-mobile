@@ -9,8 +9,6 @@ import { ScrollView } from 'react-native-gesture-handler';
 import { VictoryLine, VictoryChart, VictoryAxis } from "victory-native";
 import EventSource from "react-native-sse";
 
-
-
 export default function Home({ navigation }: RootTabScreenProps<'TabOne'>) {
   const es = new EventSource("http://localhost:4000/sse/subscribe");
 
@@ -45,19 +43,25 @@ export default function Home({ navigation }: RootTabScreenProps<'TabOne'>) {
     { x: 5, y: 4 }
   ];
 
+  //{"raisedThisWeek":8408,"donations":[{"name":"Omid Borijan","time":"2022-04-27T16:29:05.05123-07:00","campaign":"WorldCentral","amount":7008},{"name":"Tammen K","time":"2022-04-27T16:29:05.05123-07:00","campaign":"Tunnels to Towers","amount":5528},{"name":"Emad B","time":"2022-04-27T16:29:05.05123-07:00","campaign":"Tunnels to Towers","amount":3653}]}
+
+  interface StatsEvent {
+    raisedThisWeek: number;
+  }
+
   useEffect(() => {
 
     //Initial animation and set the number
     setTimeout(() => { setRaised(amount_raised) }, 100);
 
     //Random donations every 2 seconds
-    setInterval(() => {
+    // setInterval(() => {
 
-      let max = 500;
-      let min = 50000;
-      setRaised(Math.floor(Math.random() * (max - min)) + amount_raised);
+    //   let max = 500;
+    //   let min = 50000;
+    //   setRaised(Math.floor(Math.random() * (max - min)) + amount_raised);
 
-    }, 4000);
+    // }, 4000);
 
     es.addEventListener("open", (event) => {
       console.log("Open SSE connection.");
@@ -65,7 +69,8 @@ export default function Home({ navigation }: RootTabScreenProps<'TabOne'>) {
 
     es.addEventListener("message", (event) => {
       console.log("New message event:", event.data);
-      setRaised(event.data.raisedThisWeek)
+      const statsEvent = JSON.parse(event.data) as StatsEvent;
+      setRaised(statsEvent.raisedThisWeek)
     });
 
     es.addEventListener("error", (event) => {
@@ -79,7 +84,6 @@ export default function Home({ navigation }: RootTabScreenProps<'TabOne'>) {
     es.addEventListener("close", (event) => {
       console.log("Close SSE connection.");
     });
-
 
   }, [])
 
