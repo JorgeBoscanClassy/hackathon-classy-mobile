@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"classy.org/classymobile/api"
-	"classy.org/classymobile/oldsse"
 	"classy.org/classymobile/sse"
 	"github.com/gin-gonic/gin"
 )
@@ -24,15 +23,9 @@ func main() {
 	r.Use(gin.Recovery())
 
 	// SSE
-	sse.NewServer()
-	sseRoute := r.Group("/sse")
-	sseRoute.Use(HeadersMiddleware())
-	sseRoute.Use(sse.Stream.ServeHTTP())
-	sseRoute.GET("/subscribe", sse.StreamHandler)
+	r.GET("/sse/subscribe", sse.HandleSSEGin())
 	r.GET("/sse/test", sse.TestMessage)
 
-	r.GET("/oldsse/subscribe", oldsse.HandleSSEGin())
-	r.GET("/oldsse/test", oldsse.SendMessageGin("Test Message"))
 	// Donations
 	r.GET("/donations/:id", api.GetDonationById)
 	r.POST("/donations/", api.PostDonation)
