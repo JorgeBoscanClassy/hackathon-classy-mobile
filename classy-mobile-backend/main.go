@@ -32,11 +32,16 @@ func main() {
 
 	// SSE
 	stream := sse.NewServer()
-	sseRoute := r.Group("/sse")
-	sseRoute.Use(HeadersMiddleware())
-	sseRoute.Use(stream.ServeHTTP())
-	sseRoute.GET("/subscribe", sse.StreamHandler)
-	sseRoute.GET("/test", sse.TestMessage)
+	// sseRoute := r.Group("/sse")
+	// sseRoute.Use(HeadersMiddleware())
+	// sseRoute.Use(stream.ServeHTTP())
+	// sseRoute.GET("/subscribe", sse.StreamHandler)
+	// sseRoute.GET("/test", sse.TestMessage)
+
+	r.Use(HeadersMiddleware())
+	r.Use(stream.ServeHTTP())
+	r.GET("/sse/subscribe", sse.StreamHandler)
+	r.GET("/sse/test", sse.TestMessage)
 
 	r.GET("/donations/:id", api.GetDonationById)
 	r.POST("/donations/", api.PostDonation)
