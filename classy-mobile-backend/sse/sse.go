@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"time"
 
-	"classy.org/classymobile/api"
+	"classy.org/classymobile/store"
 	"github.com/gin-gonic/gin"
 )
 
@@ -67,9 +67,9 @@ func SendMessage(message interface{}) {
 }
 
 func TestMessage(ctx *gin.Context) {
-	testData := api.Home{
+	testData := store.Home{
 		RaisedThisWeek: rand.Int31n(10000),
-		Donations: []api.HomeDonation{
+		Donations: []store.HomeDonation{
 			{"Omid Borijan", time.Now(), "WorldCentral", rand.Int31n(10000)},
 			{"Tammen K", time.Now(), "Tunnels to Towers", rand.Int31n(10000)},
 			{"Emad B", time.Now(), "Tunnels to Towers", rand.Int31n(10000)},

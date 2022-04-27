@@ -1,32 +1,24 @@
 package api
 
-import "time"
+import (
+	"net/http"
 
-type Home struct {
-	RaisedThisWeek int32          `json:"raisedThisWeek,omitempty"`
-	Donations      []HomeDonation `json:"donations,omitempty"`
-}
-
-type HomeHighlight struct {
-	Name   string `json:"name,omitempty"`
-	Amount int32  `json:"amount,omitempty"`
-}
-
-type HomeDonation struct {
-	Name     string    `json:"name,omitempty"`
-	Time     time.Time `json:"time,omitempty"`
-	Campaign string    `json:"campaign,omitempty"`
-	Amount   int32     `json:"amount,omitempty"`
-}
-
-var homeData Home = Home{}
+	"classy.org/classymobile/sse"
+	"classy.org/classymobile/store"
+	"github.com/gin-gonic/gin"
+)
 
 func CalculateHomeData(donation Donation) {
-	homeData.RaisedThisWeek += donation.Amount
-	homeDonation := HomeDonation{Name: donation.Name, Time: donation.CreatedOn, Campaign: donation.Campaign, Amount: donation.Amount}
-	if len(homeData.Donations) >= 3 {
-		homeData.Donations = append(homeData.Donations[1:], homeDonation)
+	store.HomeData.RaisedThisWeek += donation.Amount
+	homeDonation := store.HomeDonation{Name: donation.Name, Time: donation.CreatedOn, Campaign: donation.Campaign, Amount: donation.Amount}
+	if len(store.HomeData.Donations) >= 3 {
+		store.HomeData.Donations = append([]store.HomeDonation{homeDonation}, store.HomeData.Donations[1:]...)
 	} else {
-		homeData.Donations = append(homeData.Donations, homeDonation)
+		store.HomeData.Donations = append([]store.HomeDonation{homeDonation}, store.HomeData.Donations...)
 	}
+	sse.SendMessage(store.HomeData)
+}
+
+func GetHomeData(ctx *gin.Context) {
+	ctx.JSON(http.StatusOK, store.HomeData)
 }
