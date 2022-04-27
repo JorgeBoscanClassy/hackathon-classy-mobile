@@ -56,6 +56,10 @@ func main() {
 		})
 	})
 
+	r.GET("/test", func(ctx *gin.Context) {
+		stream.Message <- "Test Message"
+	})
+
 	r.Use(HeadersMiddleware())
 	r.Use(stream.ServeHTTP())
 	r.GET("/sse/subscribe", sse.StreamHandler)
