@@ -5,6 +5,8 @@ import { RootTabScreenProps } from '../types';
 import AnimatedNumbers from 'react-native-animated-numbers';
 import { Highlights } from '../components/Highlights';
 import { ScrollView } from 'react-native-gesture-handler';
+import { VictoryLine, VictoryChart, VictoryAxis } from "victory-native";
+
 
 export default function Home({ navigation }: RootTabScreenProps<'TabOne'>) {
 
@@ -17,6 +19,22 @@ export default function Home({ navigation }: RootTabScreenProps<'TabOne'>) {
                       {title : "$131,632", label:"Average Raised" },
                       {title : "14", label:"Average Transactions" },]
   
+  //Charts data
+  const thisWeek = [
+    { x: 0, y: 0 },
+    { x: 2, y: 3 },
+    { x: 3, y: 5 },
+    { x: 4, y: 4 },
+    { x: 5, y: 6 }
+  ];
+  
+  const lastWeek = [
+    { x: 0, y: 0 },
+    { x: 2, y: 5 },
+    { x: 3, y: 2 },
+    { x: 4, y: 3 },
+    { x: 5, y: 4 }
+  ];
 
   useEffect(() => {
     
@@ -45,14 +63,46 @@ export default function Home({ navigation }: RootTabScreenProps<'TabOne'>) {
         fontStyle={styles.title}
       /></View>
       <Text style={styles.subTitle}>Rasied this week</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
+  
       <View style={{ marginLeft:-20}}>
       </View>
+      <View style={{ marginLeft:-20}}>
+      <VictoryChart>
+      <VictoryLine
+        interpolation="natural"
+        style={{ data: { stroke: "#f4775e", strokeWidth: 7, strokeLinecap: "round" } }}
+        data={thisWeek}
+        animate={{
+          duration: 2000,
+          onLoad: { duration: 1000 }
+        }}
+      />
+       <VictoryLine
+        data={lastWeek}
+        style={{ data: { stroke: "#E2E2E2", strokeWidth: 7, strokeLinecap: "round" } }}
+        interpolation="natural"
+        animate={{
+          duration: 2000,
+          onLoad: { duration: 2000 }
+        }}
+      />
+      <VictoryAxis style={{ 
+    axis: {stroke: "transparent"}, 
+    ticks: {stroke: "transparent"},
+    tickLabels: { fill:"transparent"} 
+}} />
+      </VictoryChart>
+      </View>
+
       <Text style={styles.sectionHeader}>Highlights</Text>
+
+      
       <Highlights data={highlights} />
+
+      <View style={styles.spacer}></View>
       <Text style={styles.sectionHeader}>Donations</Text>
 
-
+<View style={styles.spacer}></View>
       <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
     </View>
     </ScrollView>
@@ -86,5 +136,8 @@ const styles = StyleSheet.create({
   },
   appBackground:{
     backgroundColor:'#fff'
+  },
+  spacer:{
+    marginBottom:25
   }
 });

@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
   container: {},
   view: {
     marginTop: 20,
-    backgroundColor: '#EB7251',
+    backgroundColor: '#f4775e',
     width: 250,
     margin: 10,
     marginLeft:0,
