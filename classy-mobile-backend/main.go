@@ -8,12 +8,10 @@ import (
 	"strings"
 	"time"
 
+	"classy.org/classymobile/api"
 	"classy.org/classymobile/sse"
 	"github.com/gin-gonic/gin"
 )
-
-var Donations map[string]Donation = make(map[string]Donation)
-var nextId int = 0
 
 var attendees map[string]Attendee = make(map[string]Attendee)
 var nextAttendeeId = 0
@@ -28,44 +26,11 @@ func main() {
 
 	// SSE
 	r.GET("/sse/subscribe", sse.HandleSSEGin())
-	r.GET("/sse/test", func(ctx *gin.Context) {
-		testData := sse.SSEPayload{
-			Type:           []string{"highlights", "test", "donations", "raised-this-week"},
-			RaisedThisWeek: rand.Float32() * 10000000,
-			Highlights: []sse.Highlight{
-				{"Average Transaction Site", rand.Float32() * 10000000},
-				{"Total Transactions", rand.Float32() * 10000000},
-			},
-			Donations: []sse.Donations{
-				{"Omid Borijan", time.Now(), "WorldCentral", rand.Float32() * 10000000},
-				{"Tammen K", time.Now(), "Tunnels to Towers", rand.Float32() * 10000000},
-				{"Emad B", time.Now(), "Tunnels to Towers", rand.Float32() * 10000000},
-			},
-			ChartData: "Stub",
-		}
+	r.GET("/sse/test", sse.TestMessage)
 
-		sse.SendMessage(testData)
-	})
+	r.GET("/donations/:id", api.GetDonationById)
 
-	r.GET("/donations/:id", func(c *gin.Context) {
-		id := c.Param("id")
-		if donation, ok := Donations[id]; ok {
-			c.JSON(http.StatusOK, donation)
-			return
-		}
-
-		c.JSON(http.StatusBadRequest, gin.H{"error": "donation id does not exist"})
-	})
-
-	r.POST("/donations/", func(c *gin.Context) {
-		var donation Donation
-		if err := c.BindJSON(&donation); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-		donation = AddDonation(donation)
-		c.JSON(http.StatusCreated, donation)
-	})
+	r.POST("/donations/", api.PostDonation)
 
 	r.GET("/checkins/:id", func(c *gin.Context) {
 		id := c.Param("id")
@@ -95,33 +60,13 @@ func main() {
 	r.Run(":4000")
 }
 
-func AddDonation(donation Donation) Donation {
-	id := strconv.Itoa(nextId)
-	nextId += 1
-
-	donation.Id = id
-	donation.CreatedOn = time.Now()
-	Donations[id] = donation
-
-	return donation
-}
-
-type Donation struct {
-	Id           string    `json:"id"`
-	Amount       float32   `json:"amount" binding:"required"`
-	Name         string    `json:"name" binding:"required"`
-	Email        string    `json:"email" binding:"required"`
-	Organization string    `json:"organization" binding:"required"`
-	CreatedOn    time.Time `json:"createdOn"`
-}
-
 var names []string = []string{"Tammen B", "Patrick C", "Omid B", "Emad B", "Jorge B"}
 var orgs []string = []string{"World Central", "Tunnels to Towers"}
 
 func CreateStartData() {
 	for i := 0; i < 100; i++ {
 		name := names[rand.Intn(len(names))]
-		AddDonation(Donation{
+		api.AddDonation(api.Donation{
 			Amount:       rand.Float32() * 10000000,
 			Name:         name,
 			Email:        strings.ToLower(strings.TrimSpace(name)) + "@classy.org",

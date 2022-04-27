@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
 	"time"
 
@@ -93,4 +94,23 @@ func removeChannel(channel chan string) {
 		ChannelList = append(ChannelList[:index], ChannelList[index+1:]...)
 	}
 	fmt.Println("Done")
+}
+
+func TestMessage(ctx *gin.Context) {
+	testData := SSEPayload{
+		Type:           []string{"highlights", "test", "donations", "raised-this-week"},
+		RaisedThisWeek: rand.Float32() * 10000000,
+		Highlights: []Highlight{
+			{"Average Transaction Site", rand.Float32() * 10000000},
+			{"Total Transactions", rand.Float32() * 10000000},
+		},
+		Donations: []Donations{
+			{"Omid Borijan", time.Now(), "WorldCentral", rand.Float32() * 10000000},
+			{"Tammen K", time.Now(), "Tunnels to Towers", rand.Float32() * 10000000},
+			{"Emad B", time.Now(), "Tunnels to Towers", rand.Float32() * 10000000},
+		},
+		ChartData: "Stub",
+	}
+
+	SendMessage(testData)
 }
