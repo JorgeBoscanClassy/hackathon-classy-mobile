@@ -20,17 +20,17 @@ export default function CheckinScreen({ navigation }) {
           label : 'Registered 2 hours ago'
         },
         {
-          id: 3,
+          id: 4,
           title: 'Chris Himes',
           label : 'Registered 2 hours ago'
         },
         {
-            id: 3,
+            id: 5,
             title: 'Shantanu Bose',
             label : 'Registered 2 hours ago'
         },
         {
-            id: 3,
+            id: 6,
             title: 'Tammen Bruccoleri',
             label : 'Registered 2 hours ago'
         },
@@ -38,7 +38,7 @@ export default function CheckinScreen({ navigation }) {
 
       const renderItem = ({ item , navigation }) => (
         <View key={item.id} style={{paddingLeft:15}}>
-            <ListItem data={item} onPress={() => { navigation.navigate('Details') }} />
+            <ListItem data={item} />
         </View>
       );
 

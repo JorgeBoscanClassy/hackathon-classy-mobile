@@ -40,7 +40,7 @@ export class ListItems extends Component {
         }}>
             {this.props.data && this.props.data.map((card : any, index : number) => {
 
-                return <ListItem index={index} data={card}  />
+                return <ListItem key={index} index={index} data={card}  />
 
             })}
       </View>
