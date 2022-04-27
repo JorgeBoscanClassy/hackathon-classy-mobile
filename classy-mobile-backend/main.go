@@ -5,16 +5,18 @@ import (
 	"math/rand"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"classy.org/classymobile/sse"
 	"github.com/gin-gonic/gin"
 )
 
-var donations map[string]Donation = make(map[string]Donation)
+var Donations map[string]Donation = make(map[string]Donation)
 var nextId int = 0
 
 func main() {
+	CreateStartData()
 	fmt.Println("Running Gin implementation on http://localhost:4000")
 
 	r := gin.New()
@@ -44,7 +46,7 @@ func main() {
 
 	r.GET("/donations/:id", func(c *gin.Context) {
 		id := c.Param("id")
-		if donation, ok := donations[id]; ok {
+		if donation, ok := Donations[id]; ok {
 			c.JSON(http.StatusOK, donation)
 			return
 		}
@@ -58,23 +60,44 @@ func main() {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		id := strconv.Itoa(nextId)
-		nextId += 1
-
-		donation.Id = id
-		donation.CreatedOn = time.Now()
-		donations[id] = donation
+		donation = AddDonation(donation)
 		c.JSON(http.StatusCreated, donation)
 	})
 
 	r.Run(":4000")
 }
 
+func AddDonation(donation Donation) Donation {
+	id := strconv.Itoa(nextId)
+	nextId += 1
+
+	donation.Id = id
+	donation.CreatedOn = time.Now()
+	Donations[id] = donation
+
+	return donation
+}
+
 type Donation struct {
 	Id           string    `json:"id"`
-	Amount       string    `json:"amount" binding:"required"`
+	Amount       float32   `json:"amount" binding:"required"`
 	Name         string    `json:"name" binding:"required"`
 	Email        string    `json:"email" binding:"required"`
 	Organization string    `json:"organization" binding:"required"`
 	CreatedOn    time.Time `json:"createdOn"`
+}
+
+var names []string = []string{"Tammen B", "Patrick C", "Omid B", "Emad B", "Jorge B"}
+var orgs []string = []string{"World Central", "Tunnels to Towers"}
+
+func CreateStartData() {
+	for i := 0; i < 100; i++ {
+		name := names[rand.Intn(len(names))]
+		AddDonation(Donation{
+			Amount:       rand.Float32() * 10000000,
+			Name:         name,
+			Email:        strings.ToLower(strings.TrimSpace(name)) + "@classy.org",
+			Organization: orgs[rand.Intn(len(orgs))],
+		})
+	}
 }
