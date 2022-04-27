@@ -3,8 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io"
+	"log"
 	"math/rand"
-	"net/http"
 	"strconv"
 	"strings"
 	"time"
@@ -13,12 +14,6 @@ import (
 	"classy.org/classymobile/sse"
 	"github.com/gin-gonic/gin"
 )
-
-var attendees map[string]Attendee = make(map[string]Attendee)
-var nextAttendeeId = 0
-
-var events map[string]Event = make(map[string]Event)
-var nextEventId = 0
 
 func main() {
 	port := flag.Int("port", 4000, "specify a port to use http rather than AWS Lambda")
@@ -38,83 +33,127 @@ func main() {
 	// sseRoute.GET("/subscribe", sse.StreamHandler)
 	// sseRoute.GET("/test", sse.TestMessage)
 
+	r.GET("/stream", func(c *gin.Context) {
+		// We are streaming current time to clients in the interval 10 seconds
+		go func() {
+			for {
+				time.Sleep(time.Second * 10)
+				now := time.Now().Format("2006-01-02 15:04:05")
+				currentTime := fmt.Sprintf("The Current Time Is %v", now)
+
+				// Send current time to clients message channel
+				stream.Message <- currentTime
+			}
+		}()
+
+		c.Stream(func(w io.Writer) bool {
+			// Stream message to client from message channel
+			if msg, ok := <-stream.Message; ok {
+				c.SSEvent("message", msg)
+				return true
+			}
+			return false
+		})
+	})
+
 	r.Use(HeadersMiddleware())
 	r.Use(stream.ServeHTTP())
 	r.GET("/sse/subscribe", sse.StreamHandler)
 	r.GET("/sse/test", sse.TestMessage)
 
+	// Donations
 	r.GET("/donations/:id", api.GetDonationById)
 	r.POST("/donations/", api.PostDonation)
 
-	r.GET("/checkins/:id", func(c *gin.Context) {
-		id := c.Param("id")
-		if attendee, ok := attendees[id]; ok {
-			c.JSON(http.StatusOK, attendee)
-			return
-		}
-
-		c.JSON(http.StatusBadRequest, gin.H{"error": "attendee id does not exist"})
-	})
-
-	r.POST("/checkins/", func(c *gin.Context) {
-		var attendee Attendee
-		if err := c.BindJSON(&attendee); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-		id := strconv.Itoa(nextAttendeeId)
-		nextAttendeeId += 1
-		attendee.Id = id
-		attendee.CreatedOn = time.Now()
-		attendees[id] = attendee
-
-		c.JSON(http.StatusCreated, attendee)
-	})
-
-	r.GET("/events/:id", func(c *gin.Context) {
-		id := c.Param("id")
-		if event, ok := events[id]; ok {
-			c.JSON(http.StatusOK, event)
-			return
-		}
-
-		c.JSON(http.StatusBadRequest, gin.H{"error": "event id does not exist"})
-	})
-
-	r.GET("/events/:id/attendees", func(c *gin.Context) {
-		id := c.Param("id")
-		attendants := []Attendee{}
-
-		if event, ok := events[id]; ok {
-			for _, attendee := range attendees {
-				if attendee.EventId == event.Id {
-					attendants = append(attendants, attendee)
-				}
-			}
-
-			c.JSON(http.StatusOK, attendants)
-			return
-		}
-
-		c.JSON(http.StatusBadRequest, gin.H{"error": "event id does not exist"})
-	})
-
-	r.POST("/events/", func(c *gin.Context) {
-		var event Event
-		if err := c.BindJSON(&event); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-		id := strconv.Itoa(nextEventId)
-		nextEventId += 1
-		event.Id = id
-		event.CreatedOn = time.Now()
-		events[id] = event
-
-		c.JSON(http.StatusCreated, event)
-	})
+	// Events
+	r.GET("/checkins/:id", api.GetCheckinById)
+	r.POST("/checkins/", api.PostCheckin)
+	r.GET("/events/:id", api.GetEventById)
+	r.GET("/events/:id/attendees", api.GetAttendeesByEventId)
+	r.POST("/events/", api.GetEvents)
 
 	r.Run(fmt.Sprintf(":%d", *port))
+}
+
+//It keeps a list of clients those are currently attached
+//and broadcasting events to those clients.
+type Event struct {
+	// Events are pushed to this channel by the main events-gathering routine
+	Message chan string
+
+	// New client connections
+	NewClients chan chan string
+
+	// Closed client connections
+	ClosedClients chan chan string
+
+	// Total client connections
+	TotalClients map[chan string]bool
+}
+
+// New event messages are broadcast to all registered client connection channels
+type ClientChan chan string
+
+// Initialize event and Start procnteessing requests
+func NewServer() (event *Event) {
+
+	event = &Event{
+		Message:       make(chan string),
+		NewClients:    make(chan chan string),
+		ClosedClients: make(chan chan string),
+		TotalClients:  make(map[chan string]bool),
+	}
+
+	go event.listen()
+
+	return
+}
+
+//It Listens all incoming requests from clients.
+//Handles addition and removal of clients and broadcast messages to clients.
+func (stream *Event) listen() {
+	for {
+		select {
+		// Add new available client
+		case client := <-stream.NewClients:
+			stream.TotalClients[client] = true
+			log.Printf("Client added. %d registered clients", len(stream.TotalClients))
+
+		// Remove closed client
+		case client := <-stream.ClosedClients:
+			delete(stream.TotalClients, client)
+			log.Printf("Removed client. %d registered clients", len(stream.TotalClients))
+
+		// Broadcast message to client
+		case eventMsg := <-stream.Message:
+			for clientMessageChan := range stream.TotalClients {
+				clientMessageChan <- eventMsg
+			}
+		}
+	}
+}
+
+func (stream *Event) serveHTTP() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// Initialize client channel
+		clientChan := make(ClientChan)
+
+		// Send new connection to event server
+		stream.NewClients <- clientChan
+
+		defer func() {
+			// Send closed connection to event server
+			stream.ClosedClients <- clientChan
+		}()
+
+		go func() {
+			// Send connection that is closed by client to event server
+			<-c.Done()
+			stream.ClosedClients <- clientChan
+		}()
+
+		c.Next()
+	}
 }
 
 func HeadersMiddleware() gin.HandlerFunc {
@@ -140,17 +179,4 @@ func CreateStartData() {
 			Campaign: orgs[rand.Intn(len(orgs))],
 		})
 	}
-}
-
-type Attendee struct {
-	Id        string    `json:"id"`
-	Name      string    `json:"name" binding:"required"`
-	EventId   string    `json:"eventId" binding:"required"`
-	CreatedOn time.Time `json:"createdOn"`
-}
-
-type Event struct {
-	Id        string    `json:"id"`
-	Name      string    `json:"name" binding:"required"`
-	CreatedOn time.Time `json:"createdOn"`
 }
