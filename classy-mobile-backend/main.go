@@ -14,6 +14,9 @@ import (
 var donations map[string]Donation = make(map[string]Donation)
 var nextId int = 0
 
+var attendees map[string]Attendee = make(map[string]Attendee)
+var nextAttendeeId = 0
+
 func main() {
 	fmt.Println("Running Gin implementation on http://localhost:4000")
 
@@ -67,6 +70,31 @@ func main() {
 		c.JSON(http.StatusCreated, donation)
 	})
 
+	r.GET("/checkins/:id", func(c *gin.Context) {
+		id := c.Param("id")
+		if attendee, ok := attendees[id]; ok {
+			c.JSON(http.StatusOK, attendee)
+			return
+		}
+
+		c.JSON(http.StatusBadRequest, gin.H{"error": "attendee id does not exist"})
+	})
+
+	r.POST("/checkins/", func(c *gin.Context) {
+		var attendee Attendee
+		if err := c.BindJSON(&attendee); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		id := strconv.Itoa(nextAttendeeId)
+		nextAttendeeId += 1
+		attendee.Id = id
+		attendee.CreatedOn = time.Now()
+		attendees[id] = attendee
+
+		c.JSON(http.StatusCreated, attendee)
+	})
+
 	r.Run(":4000")
 }
 
@@ -77,4 +105,10 @@ type Donation struct {
 	Email        string    `json:"email" binding:"required"`
 	Organization string    `json:"organization" binding:"required"`
 	CreatedOn    time.Time `json:"createdOn"`
+}
+
+type Attendee struct {
+	Id        string    `json:"id"`
+	Name      string    `json:"name" binding:"required"`
+	CreatedOn time.Time `json:"createdOn"`
 }
