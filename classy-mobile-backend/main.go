@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"math/rand"
 	"net/http"
@@ -20,19 +21,25 @@ var events map[string]Event = make(map[string]Event)
 var nextEventId = 0
 
 func main() {
+	port := flag.Int("port", 4000, "specify a port to use http rather than AWS Lambda")
+
 	CreateStartData()
-	fmt.Println("Running Gin implementation on http://localhost:4000")
+	api.CalculateFlag = true
+	fmt.Println("Running Gin implementation on http://localhost:" + strconv.Itoa(*port))
 
 	r := gin.New()
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
 
 	// SSE
-	r.GET("/sse/subscribe", sse.HandleSSEGin())
-	r.GET("/sse/test", sse.TestMessage)
+	stream := sse.NewServer()
+	sseRoute := r.Group("/sse")
+	sseRoute.Use(HeadersMiddleware())
+	sseRoute.Use(stream.ServeHTTP())
+	sseRoute.GET("/subscribe", sse.StreamHandler)
+	sseRoute.GET("/test", sse.TestMessage)
 
 	r.GET("/donations/:id", api.GetDonationById)
-
 	r.POST("/donations/", api.PostDonation)
 
 	r.GET("/checkins/:id", func(c *gin.Context) {
@@ -103,7 +110,17 @@ func main() {
 		c.JSON(http.StatusCreated, event)
 	})
 
-	r.Run(":4000")
+	r.Run(fmt.Sprintf(":%d", *port))
+}
+
+func HeadersMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Writer.Header().Set("Content-Type", "text/event-stream")
+		c.Writer.Header().Set("Cache-Control", "no-cache")
+		c.Writer.Header().Set("Connection", "keep-alive")
+		c.Writer.Header().Set("Transfer-Encoding", "chunked")
+		c.Next()
+	}
 }
 
 var names []string = []string{"Tammen B", "Patrick C", "Omid B", "Emad B", "Jorge B"}
