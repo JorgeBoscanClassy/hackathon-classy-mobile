@@ -24,7 +24,6 @@ func main() {
 	port := flag.Int("port", 4000, "specify a port to use http rather than AWS Lambda")
 
 	CreateStartData()
-	api.CalculateFlag = true
 	fmt.Println("Running Gin implementation on http://localhost:" + strconv.Itoa(*port))
 
 	r := gin.New()
@@ -130,10 +129,10 @@ func CreateStartData() {
 	for i := 0; i < 100; i++ {
 		name := names[rand.Intn(len(names))]
 		api.AddDonation(api.Donation{
-			Amount:       rand.Float32() * 10000000,
-			Name:         name,
-			Email:        strings.ToLower(strings.TrimSpace(name)) + "@classy.org",
-			Organization: orgs[rand.Intn(len(orgs))],
+			Amount:   rand.Float32() * 1000,
+			Name:     name,
+			Email:    strings.ToLower(strings.TrimSpace(name)) + "@classy.org",
+			Campaign: orgs[rand.Intn(len(orgs))],
 		})
 	}
 }
