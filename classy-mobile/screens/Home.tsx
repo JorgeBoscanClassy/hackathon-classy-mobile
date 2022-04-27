@@ -12,6 +12,7 @@ import { VictoryLine, VictoryChart, VictoryAxis } from "victory-native";
 export default function Home({ navigation }: RootTabScreenProps<'TabOne'>) {
 
   const [ raised, setRaised ] = useState(0);
+  const [ hour, setHour ] = useState(0);
 
   const amount_raised = 1560300;
   const highlights = [{title : "$15,603.00", label:"Average Transaction Size" },
@@ -42,10 +43,20 @@ const donations = [{title : "Omid Borjian", label:"Average Transaction Size", ri
     { x: 5, y: 4 }
   ];
 
+
+  const getHour = () => {
+    const date = new Date();
+    const hour = date.getHours()
+    setHour(hour);
+   }
+
   useEffect(() => {
     
     //Initial animation and set the number
     setTimeout(()=> {   setRaised(amount_raised) }, 100);
+
+    //Get the time of the day for a greeting
+    getHour();
     
     //Random donations every 2 seconds
     setInterval(() => {
@@ -64,6 +75,7 @@ const donations = [{title : "Omid Borjian", label:"Average Transaction Size", ri
     <ScrollView style={{ backgroundColor : '#fff'}}>
     <View style={styles.container}>
     <View style={styles.spacer}></View>
+    <Text style={styles.greeting}>{hour < 12 ? "Good Morning" : "Good evening"}, Omid!</Text>
       <View style={{ flexDirection:'row'}}><Text style={styles.title}>$</Text><AnimatedNumbers
         includeComma
         animateToNumber={raised}
@@ -131,8 +143,7 @@ const styles = StyleSheet.create({
   },
   subTitle : {
     fontSize:15,
-    marginTop:10,
-    fontWeight:'normal'
+    marginTop:10
   },
   separator: {
     marginVertical: 30,
@@ -149,5 +160,9 @@ const styles = StyleSheet.create({
   },
   spacer:{
     marginBottom:25
+  },
+  greeting: {
+    fontSize:30,
+    marginBottom:20
   }
 });

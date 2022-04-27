@@ -16,8 +16,10 @@ import ModalScreen from '../screens/ModalScreen';
 import NotFoundScreen from '../screens/NotFoundScreen';
 import Home from '../screens/Home';
 import Campaigns from '../screens/Campaigns';
+import CampaignDetails from '../screens/CampaignDetails'
 import AttendessScreen from '../screens/Events';
 import ScannerScreen from '../screens/Scanner';
+import SettingsScreen from '../screens/Settings';
 import CheckinScreen from '../screens/Checkin';
 import { RootStackParamList, RootTabParamList, RootTabScreenProps } from '../types';
 import LinkingConfiguration from './LinkingConfiguration';
@@ -63,6 +65,20 @@ function CheckinStackScreen() {
     </CheckinStack.Navigator>
   );
 }
+
+
+
+const CampaignStack = createNativeStackNavigator();
+
+function CampaignStackScreen() {
+  return (
+    <CampaignStack.Navigator>
+      <CampaignStack.Screen name="Campaigns" component={Campaigns} options={{ headerTintColor: 'black', headerShown: true }}  />
+      <CampaignStack.Screen name="Campaign" component={CampaignDetails} options={{ headerTintColor: 'black', headerShown: true }}  />
+    </CampaignStack.Navigator>
+  );
+}
+
 
 
 /**
@@ -114,15 +130,16 @@ function BottomTabNavigator() {
       />
        <BottomTab.Screen
         name="TabTwo"
-        component={Campaigns}
+        component={CampaignStackScreen}
         options={{
           title: 'Campaigns',
+          headerShown: false,
           tabBarIcon: ({ color }) => <TabBarIcon name="heart" color={color} />,
         }}
       />
        <BottomTab.Screen
         name="Profile"
-        component={Campaigns}
+        component={SettingsScreen}
         options={{
           title: 'Settings',
           tabBarIcon: ({ color }) => <TabBarIcon name="settings" color={color} />,
