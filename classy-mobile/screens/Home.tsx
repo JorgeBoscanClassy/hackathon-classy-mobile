@@ -4,6 +4,7 @@ import { Text, View } from '../components/Themed';
 import { RootTabScreenProps } from '../types';
 import AnimatedNumbers from 'react-native-animated-numbers';
 import { Highlights } from '../components/Highlights';
+import { ListItems } from '../components/ListItems';
 import { ScrollView } from 'react-native-gesture-handler';
 import { VictoryLine, VictoryChart, VictoryAxis } from "victory-native";
 
@@ -18,6 +19,11 @@ export default function Home({ navigation }: RootTabScreenProps<'TabOne'>) {
                       {title : "5,632", label:"Active Campaigns" },
                       {title : "$131,632", label:"Average Raised" },
                       {title : "14", label:"Average Transactions" },]
+
+const donations = [{title : "Omid Borjian", label:"Average Transaction Size", right: "$530" },
+                      {title : "Tammen Bruccoleri", label:"Total Transactions", right: "$420"  },
+                      {title : "Emad Borjian", label:"Active Campaigns", right: "$380"  },
+                      {title : "Chris Himes", label:"Average Raised" , right: "$850" }]
   
   //Charts data
   const thisWeek = [
@@ -55,8 +61,9 @@ export default function Home({ navigation }: RootTabScreenProps<'TabOne'>) {
 
 
   return (
-    <ScrollView>
+    <ScrollView style={{ backgroundColor : '#fff'}}>
     <View style={styles.container}>
+    <View style={styles.spacer}></View>
       <View style={{ flexDirection:'row'}}><Text style={styles.title}>$</Text><AnimatedNumbers
         includeComma
         animateToNumber={raised}
@@ -102,8 +109,10 @@ export default function Home({ navigation }: RootTabScreenProps<'TabOne'>) {
       <View style={styles.spacer}></View>
       <Text style={styles.sectionHeader}>Donations</Text>
 
-<View style={styles.spacer}></View>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
+      <View style={styles.spacer}></View>
+      <ListItems data={donations} />
+
+
     </View>
     </ScrollView>
   );
@@ -111,6 +120,7 @@ export default function Home({ navigation }: RootTabScreenProps<'TabOne'>) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor:'#fff',
     padding:20,
     alignItems: 'flex-start',
     justifyContent: 'flex-start',
@@ -122,7 +132,7 @@ const styles = StyleSheet.create({
   subTitle : {
     fontSize:15,
     marginTop:10,
-    fontWeight:'bold'
+    fontWeight:'normal'
   },
   separator: {
     marginVertical: 30,
