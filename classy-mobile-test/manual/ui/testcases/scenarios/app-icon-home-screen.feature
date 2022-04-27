@@ -9,7 +9,6 @@ Feature: Display of the app icon on the Home Screen
 
 Background:
   # DEV ENVIRONMENT
-  * def classyMobileApp = 'exp://34-hbi.classyomid.classy-mobile.exp.direct:80'
   # END
 
   # STAGING ENVIRONMENT 
@@ -19,6 +18,9 @@ Background:
   # END
 
   # GENERAL
+  * def appName = 'Classy Mobile'
+  * def companyName = 'Classy'
+  * def color = 'Coral'
   # END
 
 @P3
@@ -28,10 +30,10 @@ Background:
 Scenario: Verify the app icon is rendered correctly on the Home Screen
 
   # Ensure app is installed
-  Given an admin installs classyMobileApp through 'App Store' on an iOS device
+  Given an admin installs appName through 'App Store' on an iOS device
   
   # Navigate to app icon
-  When navigate to 'Home Screen' page that app icon is located
+  When navigate to 'Home Screen' page where app icon is located
   
   # Verify app icon is rendered correctly
-  Then verify app icon contains Classy logo on coral background
+  Then verify app icon contains companyName logo on color background
