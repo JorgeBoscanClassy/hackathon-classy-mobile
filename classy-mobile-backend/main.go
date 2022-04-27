@@ -64,7 +64,7 @@ func CreateStartData() {
 	for i := 0; i < 100; i++ {
 		name := names[rand.Intn(len(names))]
 		api.AddDonation(api.Donation{
-			Amount:   rand.Uint64(),
+			Amount:   rand.Int31n(10000),
 			Name:     name,
 			Email:    strings.ToLower(strings.TrimSpace(name)) + "@classy.org",
 			Campaign: orgs[rand.Intn(len(orgs))],

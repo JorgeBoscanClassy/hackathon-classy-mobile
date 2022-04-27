@@ -113,11 +113,11 @@ func SendMessage(message interface{}, ctx *gin.Context) {
 
 func TestMessage(ctx *gin.Context) {
 	testData := api.Home{
-		RaisedThisWeek: rand.Uint64(),
+		RaisedThisWeek: rand.Int31n(10000),
 		Donations: []api.HomeDonation{
-			{"Omid Borijan", time.Now(), "WorldCentral", rand.Uint64()},
-			{"Tammen K", time.Now(), "Tunnels to Towers", rand.Uint64()},
-			{"Emad B", time.Now(), "Tunnels to Towers", rand.Uint64()},
+			{"Omid Borijan", time.Now(), "WorldCentral", rand.Int31n(10000)},
+			{"Tammen K", time.Now(), "Tunnels to Towers", rand.Int31n(10000)},
+			{"Emad B", time.Now(), "Tunnels to Towers", rand.Int31n(10000)},
 		},
 	}
 
