@@ -29,6 +29,8 @@ func HandleSSEGin() gin.HandlerFunc {
 		messageChan := make(chan string)
 		MessageList = append(MessageList, messageChan)
 
+		orgId := ctx.Param("orgId")
+		log.Printf("Created SSE channel for Org: " + orgId)
 		// close the channel after exit the function
 		defer func() {
 			close(messageChan)

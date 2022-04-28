@@ -23,12 +23,12 @@ func main() {
 	r.Use(gin.Recovery())
 
 	// SSE
-	r.GET("/sse/subscribe", sse.HandleSSEGin())
+	r.GET("/sse/:orgId/subscribe", sse.HandleSSEGin())
 	r.GET("/sse/test", sse.TestMessage)
 
 	// Donations
 	r.GET("/donations/:id", api.GetDonationById)
-	r.POST("/donations/", api.PostDonation)
+	r.POST("/donations", api.PostDonation)
 
 	// Events
 	r.GET("/checkins/:id", api.GetCheckinById)
@@ -36,6 +36,9 @@ func main() {
 	r.GET("/events/:id", api.GetEventById)
 	r.GET("/events/:id/attendees", api.GetAttendeesByEventId)
 	r.POST("/events/", api.GetEvents)
+
+	// Home
+	r.GET("/home", api.GetHomeData)
 
 	r.Run(fmt.Sprintf(":%d", *port))
 }
