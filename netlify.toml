@@ -2,7 +2,6 @@
   base = "classy-mobile-backend"
   command = "./build.sh"
   functions = "functions"
-  publish = "public"
 
 [build.environment]
   GO_IMPORT_PATH = "https://github.com/JorgeBoscanClassy/hackathon-classy-mobile"
