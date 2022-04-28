@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"math/rand"
+	"net/http"
 	"strconv"
 	"strings"
 
@@ -21,6 +22,11 @@ func main() {
 	r := gin.New()
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
+
+	// StatusCheck
+	r.GET("/", func(ctx *gin.Context) {
+		ctx.String(http.StatusOK, "Active")
+	})
 
 	// SSE
 	r.GET("/sse/:orgId/subscribe", sse.HandleSSEGin())
