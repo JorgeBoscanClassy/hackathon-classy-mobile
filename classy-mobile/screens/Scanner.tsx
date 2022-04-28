@@ -15,6 +15,7 @@ export default function Scanner({ navigation }) {
 
     const [hasPermission, setHasPermission] = useState(null);
     const [scanned, setScanned] = useState(false);
+    const [checkedIn, setCheckedIn] = useState(false);
   
     useEffect(() => {
       (async () => {
@@ -25,7 +26,7 @@ export default function Scanner({ navigation }) {
   
     const handleBarCodeScanned = ({ type, data }) => {
       setScanned(true);
-      alert(`Bar code with type ${type} and data ${data} has been scanned!`);
+      //alert(`Bar code scanned! It says data ${data} `);
     };
   
     if (hasPermission === null) {
@@ -42,19 +43,19 @@ export default function Scanner({ navigation }) {
     <View style={styles.container}>
     
     <View style={styles.camera}>
-    <BarCodeScanner
+     <BarCodeScanner
         onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
         style={StyleSheet.absoluteFillObject}
       />
     </View>
-    <View style={styles.card}>
+    {scanned && <View style={styles.card}>
       <Text style={styles.event}>Classy Gala</Text>
       <Text style={styles.title}>General Admission</Text>
       <Text style={styles.attendee}>Omid Borjian</Text>
-      <TouchableOpacity style={styles.button}><Text style={styles.buttonText}>Check In</Text></TouchableOpacity>
-      <TouchableOpacity style={styles.button}><Text style={styles.buttonText}>Send Receipt</Text></TouchableOpacity>
-</View>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
+      <TouchableOpacity style={styles.button} onPress={() => { setCheckedIn(!checkedIn);  }}><Text style={styles.buttonText}>{ checkedIn ?  'Check out' : 'Check In'}</Text></TouchableOpacity>
+      {scanned && <TouchableOpacity onPress={() => { setScanned(false);  }} style={[styles.button,{backgroundColor:'#000'}]}><Text style={styles.buttonText} >Scan Again</Text></TouchableOpacity>}
+      
+</View>}
     </View>
   );
 }
