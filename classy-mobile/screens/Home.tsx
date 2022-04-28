@@ -10,7 +10,7 @@ import { VictoryLine, VictoryChart, VictoryAxis } from "victory-native";
 import EventSource from "react-native-sse";
 
 export default function Home({ navigation }: RootTabScreenProps<'TabOne'>) {
-  const es = new EventSource("http://localhost:4000/sse/subscribe");
+  const es = new EventSource("http://localhost:4000/sse/55123/subscribe");
 
   const [raised, setRaised] = useState(0);
 
